@@ -1,7 +1,6 @@
 <script setup lang="ts">
-definePageMeta({
-  layout: false
-})
+import { computed } from 'vue'
+import { useRoute } from 'vue-router'
 
 const route = useRoute()
 const code = computed(() => route.params.code as string)
