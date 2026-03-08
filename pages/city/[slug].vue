@@ -11,10 +11,12 @@ import CityView from '~/components/micro-app/city-view/CityView.vue'
 
 const route = useRoute()
 
+const { data: wikidataSummary } = useFetch('https://ru.wikipedia.org/api/rest_v1/page/summary/Барселона')
+
 const cityViewData = computed<CityViewData>(() => ({
   cityName: 'Барселона',
   countryName: 'Испания',
-  summary: mockWikidataSummary().summary,
+  summary: (wikidataSummary.value as any)?.extract || '',
   weather: mockOpenWeather(),
   mapView: mockOpenRouteServiceMap(),
   ideas: mockAiIdeas()
