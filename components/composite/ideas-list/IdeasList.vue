@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import BaseHeading from '~/components/base/base-heading/BaseHeading.vue';
+import BaseCard from '~/components/base/base-card/BaseCard.vue';
 import type { TravelIdea } from '~/types'
 
 defineOptions({
@@ -13,7 +15,7 @@ defineProps<{
 <template>
   <section class="ideas-list">
     <BaseCard tag="section">
-      <BaseHeading level="2" class="ideas-list__title">
+      <BaseHeading :level="2" class="ideas-list__title">
         Идеи для путешествия
       </BaseHeading>
       <ul class="ideas-list__list">

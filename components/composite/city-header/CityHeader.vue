@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import BaseHeading from '~/components/base/base-heading/BaseHeading.vue';
 defineOptions({
   name: 'CityHeader'
 })
@@ -11,7 +12,7 @@ defineProps<{
 
 <template>
   <header class="city-header">
-    <BaseHeading level="1" class="city-header__title">
+    <BaseHeading :level="1" class="city-header__title">
       {{ cityName }}
     </BaseHeading>
     <p v-if="countryName" class="city-header__country">

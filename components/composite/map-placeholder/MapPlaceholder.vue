@@ -1,5 +1,7 @@
 <script setup lang="ts">
+import BaseHeading from '~/components/base/base-heading/BaseHeading.vue';
 import type { MapView } from '~/types'
+import BaseCard from '~/components/base/base-card/BaseCard.vue';
 
 defineOptions({
   name: 'MapPlaceholder'
@@ -13,7 +15,7 @@ defineProps<{
 <template>
   <section class="map-placeholder">
     <BaseCard tag="section">
-      <BaseHeading level="2" class="map-placeholder__title">
+      <BaseHeading :level="2" class="map-placeholder__title">
         Карта
       </BaseHeading>
       <div class="map-placeholder__area" aria-hidden="true">

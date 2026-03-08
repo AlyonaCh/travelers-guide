@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import BaseHeading from '~/components/base/base-heading/BaseHeading.vue';
+import BaseCard from '~/components/base/base-card/BaseCard.vue';
 import type { Weather } from '~/types'
 
 defineOptions({
@@ -13,7 +15,7 @@ defineProps<{
 <template>
   <section class="weather-card">
     <BaseCard tag="section">
-      <BaseHeading level="2" class="weather-card__title">
+      <BaseHeading :level="2" class="weather-card__title">
         Погода
       </BaseHeading>
       <div class="weather-card__content">
