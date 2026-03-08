@@ -6,7 +6,7 @@ export interface CityViewData {
   cityName: string
   countryName?: string
   summary: string
-  weather: Weather
+  weather: Weather | null
   mapView: MapView
   ideas: TravelIdea[]
 }

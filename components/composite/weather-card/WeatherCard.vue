@@ -8,21 +8,36 @@ defineOptions({
 })
 
 defineProps<{
-  weather: Weather
+  weather: Weather | null
 }>()
 </script>
 
 <template>
   <section class="weather-card">
     <BaseCard tag="section">
-      <BaseHeading :level="2" class="weather-card__title">
-        Погода
-      </BaseHeading>
-      <div class="weather-card__content">
-        <span class="weather-card__temp">{{ weather.temp }}°C</span>
-        <span class="weather-card__description">{{ weather.description }}</span>
-        <span class="weather-card__icon" :aria-label="weather.description">🌤</span>
+      <div>
+        <BaseHeading :level="2" class="weather-card__title">
+          Погода
+        </BaseHeading>
+        <ClientOnly>
+          <div v-if="weather" class="weather-card__content">
+            <span class="weather-card__temp">{{  `${weather.temp}°C` }}</span>
+            <span class="weather-card__description">{{ weather.description }}</span>
+            <span
+              class="weather-card__icon"
+              :aria-label="weather.description"
+            >
+              🌤
+            </span>
+          </div>
+          <div v-else class="weather-card__content">
+            <span class="weather-card__temp">—</span>
+            <span class="weather-card__description">—</span>
+            <span class="weather-card__icon" aria-label="Погода">🌤</span>
+          </div>
+        </ClientOnly>
       </div>
+     
     </BaseCard>
   </section>
 </template>

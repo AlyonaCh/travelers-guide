@@ -1,23 +1,22 @@
 <script setup lang="ts">
 import type { CityViewData } from '~/components/micro-app/city-view/city-view.types'
-import { mockWikidataSummary } from '~/mock/api/wikidata'
-import { mockOpenWeather } from '~/mock/api/openweather'
 import { mockOpenRouteServiceMap } from '~/mock/api/openrouteservice'
 import { mockAiIdeas } from '~/mock/api/ai-ideas'
-import { useRoute } from 'vue-router'
 import { computed } from 'vue'
 import CityView from '~/components/micro-app/city-view/CityView.vue'
-
+import { useRoute } from 'vue-router'
 
 const route = useRoute()
+const cityName = computed(() => decodeURIComponent(String(route.params.slug)))
 
-const { data: wikidataSummary } = useFetch('https://ru.wikipedia.org/api/rest_v1/page/summary/Барселона')
+const { summary } = useWikidata(cityName)
+const { cityWeather, geocodingResult } = useWeather(cityName)
 
 const cityViewData = computed<CityViewData>(() => ({
   cityName: 'Барселона',
-  countryName: 'Испания',
-  summary: (wikidataSummary.value as any)?.extract || '',
-  weather: mockOpenWeather(),
+  countryName: geocodingResult.value?.country ?? '',
+  summary: summary.value,
+  weather: cityWeather.value,
   mapView: mockOpenRouteServiceMap(),
   ideas: mockAiIdeas()
 }))
