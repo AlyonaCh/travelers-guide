@@ -17,5 +17,6 @@ export interface OpenMeteoCurrentWeather {
 }
 
 export interface OpenMeteoForecastResponse {
-  current_weather?: OpenMeteoCurrentWeather
+  current_weather?: OpenMeteoCurrentWeather,
+  country?: string
 }

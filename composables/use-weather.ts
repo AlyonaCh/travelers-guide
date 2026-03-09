@@ -71,28 +71,15 @@ function mapWeatherCodeToWeather(
 
 export function useWeather(cityName: MaybeRefOrGetter<string>) {
   const name = computed(() => toValue(cityName))
-  const encodedName = computed(() => encodeURIComponent(name.value))
 
-  const { data: cityGeocoding, status: cityGeocodingStatus } = useAsyncData(
-    () => `cityGeocoding-${name.value}`,
+  const { data: weatherRaw, error } = useAsyncData(
+    () => `cityWeather-${cityName}`,
     () =>
-      $fetch<GeocodingResponse>(
-        `https://geocoding-api.open-meteo.com/v1/search?name=${encodedName.value}&language=ru&count=1`
-      ),
-    { watch: [name] }
+      $fetch<OpenMeteoForecastResponse>(`/api/weather/${name.value}`)
   )
-
-  const latitude = computed(() => cityGeocoding.value?.results?.[0]?.latitude)
-  const longitude = computed(() => cityGeocoding.value?.results?.[0]?.longitude)
-
-  const { data: weatherRaw } = useAsyncData(
-    () => `cityWeather-${latitude.value}-${longitude.value}`,
-    () =>
-      $fetch<OpenMeteoForecastResponse>(
-        `https://api.open-meteo.com/v1/forecast?latitude=${latitude.value}&longitude=${longitude.value}&current_weather=true`
-      ),
-    { watch: [latitude, longitude] }
-  )
+  watch(error, (newError) => {
+    alert(newError)
+  })
 
   const cityWeather = computed<Weather | null>(() => {
     const current = weatherRaw.value?.current_weather
@@ -101,12 +88,10 @@ export function useWeather(cityName: MaybeRefOrGetter<string>) {
     }
     return mapWeatherCodeToWeather(current.weathercode, current.temperature)
   })
-
-  const geocodingResult = computed(() => cityGeocoding.value?.results?.[0])
+  const country = computed(() => weatherRaw.value?.country ?? '')
 
   return {
     cityWeather,
-    cityGeocodingStatus,
-    geocodingResult
+    country
   }
 }

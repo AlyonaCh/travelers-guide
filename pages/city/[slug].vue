@@ -10,11 +10,11 @@ const route = useRoute()
 const cityName = computed(() => decodeURIComponent(String(route.params.slug)))
 
 const { summary } = useWikidata(cityName)
-const { cityWeather, geocodingResult } = useWeather(cityName)
+const { cityWeather, country } = useWeather(cityName)
 
 const cityViewData = computed<CityViewData>(() => ({
   cityName: 'Барселона',
-  countryName: geocodingResult.value?.country ?? '',
+  countryName: country.value,
   summary: summary.value,
   weather: cityWeather.value,
   mapView: mockOpenRouteServiceMap(),

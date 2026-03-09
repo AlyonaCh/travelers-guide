@@ -1,19 +1,18 @@
-import type { WikipediaSummaryResponse } from './use-wikidata.types'
-
 export function useWikidata(cityName: MaybeRefOrGetter<string>) {
   const name = computed(() => toValue(cityName))
-  const encodedName = computed(() => encodeURIComponent(name.value))
 
-  const { data: wikidataSummary } = useAsyncData(
+  const { data: wikidataSummary, error } = useAsyncData(
     () => `wikidataSummary-${name.value}`,
     () =>
-      $fetch<WikipediaSummaryResponse>(
-        `https://ru.wikipedia.org/api/rest_v1/page/summary/${encodedName.value}`
-      ),
+      $fetch<WikipediaSummaryResponse>(`/api/wikidata/${name.value}`),
     { watch: [name] }
   )
 
   const summary = computed(() => wikidataSummary.value?.extract ?? '')
+
+  watch(error, (newError) => {
+    alert(newError)
+  })
 
   return {
     summary,
