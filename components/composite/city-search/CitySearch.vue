@@ -24,7 +24,7 @@ const { data, pending, error, execute, status } = useFetch<GeocodingSearchRespon
 )
 watch(status, (newStatus) => {
   if (newStatus === 'success') {
-    options.value.push(...data.value?.results ?? [])
+    options.value = data.value?.results ?? []
   }
 })
 function handleUpdate() {
