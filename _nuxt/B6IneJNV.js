@@ -1,0 +1,1 @@
+import{e as t,c as a,a as s,t as c,g as n,C as r,o as u}from"./hnkpGUNx.js";const _=t({__name:"[code]",setup(l){const e=r(),o=n(()=>e.params.code);return(p,d)=>(u(),a("div",null,[s("h1",null,"Country: "+c(o.value),1)]))}});export{_ as default};
