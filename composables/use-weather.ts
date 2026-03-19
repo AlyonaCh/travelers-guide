@@ -1,90 +1,128 @@
 import type { Weather } from '~/types'
-import type {
-  OpenMeteoForecastResponse
-} from './use-weather.types'
+import type { OpenMeteoForecastResponse } from './use-weather.types'
 
-const WMO_WEATHER_DESCRIPTIONS: Record<number, string> = {
-  0: 'Ясно',
-  1: 'Преимущественно ясно',
-  2: 'Переменная облачность',
-  3: 'Пасмурно',
-  45: 'Туман',
-  48: 'Изморозь',
-  51: 'Морось',
-  53: 'Морось',
-  55: 'Морось',
-  61: 'Дождь',
-  63: 'Дождь',
-  65: 'Сильный дождь',
-  71: 'Снег',
-  73: 'Снег',
-  75: 'Сильный снег',
-  77: 'Снежные зёрна',
-  80: 'Ливень',
-  81: 'Ливень',
-  82: 'Сильный ливень',
-  85: 'Снегопад',
-  86: 'Сильный снегопад',
-  95: 'Гроза',
-  96: 'Гроза с градом',
-  99: 'Гроза с крупным градом'
+type WeatherMeta = {
+  description: string
+  icon: string
 }
 
-const WMO_WEATHER_ICONS: Record<number, string> = {
-  0: '01d',
-  1: '02d',
-  2: '03d',
-  3: '04d',
-  45: '50d',
-  48: '50d',
-  51: '09d',
-  53: '09d',
-  55: '09d',
-  61: '10d',
-  63: '10d',
-  65: '10d',
-  71: '13d',
-  73: '13d',
-  75: '13d',
-  77: '13d',
-  80: '09d',
-  81: '09d',
-  82: '09d',
-  85: '13d',
-  86: '13d',
-  95: '11d',
-  96: '11d',
-  99: '11d'
+const WEATHER_META: Record<number, WeatherMeta> = {
+  0: { description: 'Ясно', icon: '01d' },
+  1: { description: 'Преимущественно ясно', icon: '02d' },
+  2: { description: 'Переменная облачность', icon: '03d' },
+  3: { description: 'Пасмурно', icon: '04d' },
+  45: { description: 'Туман', icon: '50d' },
+  48: { description: 'Изморозь', icon: '50d' },
+  51: { description: 'Морось', icon: '09d' },
+  53: { description: 'Морось', icon: '09d' },
+  55: { description: 'Морось', icon: '09d' },
+  61: { description: 'Дождь', icon: '10d' },
+  63: { description: 'Дождь', icon: '10d' },
+  65: { description: 'Сильный дождь', icon: '10d' },
+  71: { description: 'Снег', icon: '13d' },
+  73: { description: 'Снег', icon: '13d' },
+  75: { description: 'Сильный снег', icon: '13d' },
+  77: { description: 'Снежные зёрна', icon: '13d' },
+  80: { description: 'Ливень', icon: '09d' },
+  81: { description: 'Ливень', icon: '09d' },
+  82: { description: 'Сильный ливень', icon: '09d' },
+  85: { description: 'Снегопад', icon: '13d' },
+  86: { description: 'Сильный снегопад', icon: '13d' },
+  95: { description: 'Гроза', icon: '11d' },
+  96: { description: 'Гроза с градом', icon: '11d' },
+  99: { description: 'Гроза с крупным градом', icon: '11d' }
 }
 
-function mapWeatherCodeToWeather(
-  code: number,
-  temperature: number
-): Weather {
+const DEFAULT_WEATHER: WeatherMeta = {
+  description: 'Неизвестно',
+  icon: '01d'
+}
+
+function mapWeather(code: number, temperature: number): Weather {
+  const meta = WEATHER_META[code] ?? DEFAULT_WEATHER
+
   return {
     temp: Math.round(temperature),
-    description: WMO_WEATHER_DESCRIPTIONS[code] ?? 'Неизвестно',
-    icon: WMO_WEATHER_ICONS[code] ?? '01d'
+    description: meta.description,
+    icon: meta.icon
   }
 }
 
-export function useWeather(cityName: MaybeRefOrGetter<string>) {
-  const name = computed(() => toValue(cityName))
+async function fetchWeatherByCoords(lat: number, lon: number) {
+  return $fetch<OpenMeteoForecastResponse>(
+    `https://api.open-meteo.com/v1/forecast`,
+    {
+      params: {
+        latitude: lat,
+        longitude: lon,
+        current_weather: true
+      }
+    }
+  )
+}
 
-  const { data: weatherRaw, error, pending } = useAsyncData(
-    () => `cityWeather-${name.value}`,
-    () => $fetch<OpenMeteoForecastResponse>(`/api/weather/${name.value}`),
-    { watch: [name] }
+async function fetchGeocoding(city: string) {
+  return $fetch<GeocodingResponse>(
+    `https://geocoding-api.open-meteo.com/v1/search`,
+    {
+      params: {
+        name: city,
+        language: 'ru',
+        count: 1
+      }
+    }
+  )
+}
+
+export function useWeather(cityName: MaybeRefOrGetter<string>) {
+  const config = useRuntimeConfig()
+
+  const name = computed(() => toValue(cityName).trim())
+  const isPagesEnv = computed(
+    () => config.public.deployEnv === 'pages'
+  )
+
+  const { data, error, pending } = useAsyncData(
+    () => `weather:${name.value}`,
+    async () => {
+      if (!name.value) return null
+
+      if (!isPagesEnv.value) {
+        return $fetch<OpenMeteoForecastResponse>(
+          `/api/weather/${encodeURIComponent(name.value)}`
+        )
+      }
+
+      const geo = await fetchGeocoding(name.value)
+      const location = geo.results?.[0]
+
+      if (!location) return null
+
+      const weather = await fetchWeatherByCoords(
+        location.latitude,
+        location.longitude
+      )
+
+      return {
+        ...weather,
+        country: location.country
+      }
+    },
+    {
+      watch: [name],
+      lazy: true,
+      server: !isPagesEnv.value
+    }
   )
 
   const cityWeather = computed<Weather | null>(() => {
-    const current = weatherRaw.value?.current_weather
-    if (!current) {
-      return null
-    }
-    return mapWeatherCodeToWeather(current.weathercode, current.temperature)
+    const current = data.value?.current_weather
+    if (!current) return null
+
+    return mapWeather(current.weathercode, current.temperature)
   })
-  const country = computed(() => weatherRaw.value?.country ?? '')
+
+  const country = computed(() => data.value?.country ?? '')
 
   return {
     cityWeather,

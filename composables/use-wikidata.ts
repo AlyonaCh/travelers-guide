@@ -5,11 +5,23 @@ const defaultCoordinates = {
 
 export function useWikidata(cityName: MaybeRefOrGetter<string>) {
   const name = computed(() => toValue(cityName))
+  const config = useRuntimeConfig()
+  const isPagesEnv = computed(() => config.public.deployEnv === 'pages')
+
+  const requestUrl = computed(() => {
+    const encodedCity = encodeURIComponent(name.value)
+
+    if (isPagesEnv.value) {
+      return `https://ru.wikipedia.org/api/rest_v1/page/summary/${encodedCity}`
+    }
+
+    return `/api/wikidata/${encodedCity}`
+  })
 
   const { data: wikidataSummary, error, pending } = useAsyncData(
     () => `wikidataSummary-${name.value}`,
-    () => $fetch<WikipediaSummaryResponse>(`/api/wikidata/${name.value}`),
-    { watch: [name] }
+    () => $fetch<WikipediaSummaryResponse>(requestUrl.value),
+    { watch: [name, requestUrl], server: !isPagesEnv.value }
   )
 
   const summary = computed(() => wikidataSummary.value?.extract ?? '')
