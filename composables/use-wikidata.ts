@@ -1,3 +1,8 @@
+const defaultCoordinates = {
+  lat: 0,
+  lon: 0
+}
+
 export function useWikidata(cityName: MaybeRefOrGetter<string>) {
   const name = computed(() => toValue(cityName))
 
@@ -10,12 +15,15 @@ export function useWikidata(cityName: MaybeRefOrGetter<string>) {
 
   const summary = computed(() => wikidataSummary.value?.extract ?? '')
 
+  const coordinates = computed(() => wikidataSummary.value?.coordinates ?? defaultCoordinates)
+
   watch(error, (newError) => {
     alert(newError)
   })
 
   return {
     summary,
+    coordinates,
     wikidataSummary
   }
 }

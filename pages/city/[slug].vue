@@ -9,15 +9,21 @@ import { useRoute } from 'vue-router'
 const route = useRoute()
 const cityName = computed(() => decodeURIComponent(String(route.params.slug)))
 
-const { summary } = useWikidata(cityName)
+const { summary, coordinates } = useWikidata(cityName)
 const { cityWeather, country } = useWeather(cityName)
+const mapView = computed(() => ({
+  center: {
+    lat: coordinates.value.lat,
+    lon: coordinates.value.lon
+  }
+}))
 
 const cityViewData = computed<CityViewData>(() => ({
-  cityName: 'Барселона',
+  cityName: cityName.value,
   countryName: country.value,
   summary: summary.value,
   weather: cityWeather.value,
-  mapView: mockOpenRouteServiceMap(),
+  mapView: mapView.value,
   ideas: mockAiIdeas()
 }))
 </script>

@@ -20,7 +20,7 @@ defineProps<{
       </BaseHeading>
       <div class="map-placeholder__area" aria-hidden="true">
         <span class="map-placeholder__hint">
-          Карта ({{ mapView.center.lat }}, {{ mapView.center.lon }}) · zoom {{ mapView.zoom }}
+          Карта ({{ mapView.center.lat }}, {{ mapView.center.lon }})
         </span>
       </div>
     </BaseCard>
