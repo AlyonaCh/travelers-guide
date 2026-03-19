@@ -1,6 +1,5 @@
 import type { Weather } from '~/types'
 import type {
-  GeocodingResponse,
   OpenMeteoForecastResponse
 } from './use-weather.types'
 
@@ -73,13 +72,10 @@ export function useWeather(cityName: MaybeRefOrGetter<string>) {
   const name = computed(() => toValue(cityName))
 
   const { data: weatherRaw, error, pending } = useAsyncData(
-    () => `cityWeather-${cityName}`,
-    () =>
-      $fetch<OpenMeteoForecastResponse>(`/api/weather/${name.value}`)
+    () => `cityWeather-${name.value}`,
+    () => $fetch<OpenMeteoForecastResponse>(`/api/weather/${name.value}`),
+    { watch: [name] }
   )
-  watch(error, (newError) => {
-    alert(newError)
-  })
 
   const cityWeather = computed<Weather | null>(() => {
     const current = weatherRaw.value?.current_weather
@@ -93,6 +89,7 @@ export function useWeather(cityName: MaybeRefOrGetter<string>) {
   return {
     cityWeather,
     country,
-    isLoading: pending
+    isLoading: pending,
+    error
   }
 }

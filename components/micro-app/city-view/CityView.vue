@@ -6,6 +6,7 @@ import WeatherCard from '~/components/composite/weather-card/WeatherCard.vue';
 import MapPlaceholder from '~/components/composite/map-placeholder/MapPlaceholder.vue';
 import IdeasList from '~/components/composite/ideas-list/IdeasList.vue';
 import BaseSkeleton from '~/components/base/base-skeleton/BaseSkeleton.vue';
+import BaseErrorMessage from '~/components/base/base-error-message/BaseErrorMessage.vue';
 
 defineOptions({
   name: 'CityView'
@@ -14,6 +15,7 @@ defineOptions({
 defineProps<{
   data: CityViewData
   isLoading?: boolean
+  errorMessage?: string
 }>()
 </script>
 
@@ -23,6 +25,9 @@ defineProps<{
       :city-name="data.cityName"
       :country-name="data.countryName"
     />
+
+    <BaseErrorMessage v-if="errorMessage" :message="errorMessage" />
+
     <BaseSkeleton v-if="isLoading" class="city-view__skeleton city-view__skeleton--about" />
     <SectionAbout v-else :summary="data.summary" />
 
