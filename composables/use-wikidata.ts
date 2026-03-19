@@ -6,7 +6,7 @@ const defaultCoordinates = {
 export function useWikidata(cityName: MaybeRefOrGetter<string>) {
   const name = computed(() => toValue(cityName))
 
-  const { data: wikidataSummary, error } = useAsyncData(
+  const { data: wikidataSummary, error, pending } = useAsyncData(
     () => `wikidataSummary-${name.value}`,
     () =>
       $fetch<WikipediaSummaryResponse>(`/api/wikidata/${name.value}`),
@@ -24,6 +24,7 @@ export function useWikidata(cityName: MaybeRefOrGetter<string>) {
   return {
     summary,
     coordinates,
-    wikidataSummary
+    wikidataSummary,
+    isLoading: pending
   }
 }

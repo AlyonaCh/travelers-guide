@@ -72,7 +72,7 @@ function mapWeatherCodeToWeather(
 export function useWeather(cityName: MaybeRefOrGetter<string>) {
   const name = computed(() => toValue(cityName))
 
-  const { data: weatherRaw, error } = useAsyncData(
+  const { data: weatherRaw, error, pending } = useAsyncData(
     () => `cityWeather-${cityName}`,
     () =>
       $fetch<OpenMeteoForecastResponse>(`/api/weather/${name.value}`)
@@ -92,6 +92,7 @@ export function useWeather(cityName: MaybeRefOrGetter<string>) {
 
   return {
     cityWeather,
-    country
+    country,
+    isLoading: pending
   }
 }

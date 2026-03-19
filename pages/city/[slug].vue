@@ -9,8 +9,9 @@ import { useRoute } from 'vue-router'
 const route = useRoute()
 const cityName = computed(() => decodeURIComponent(String(route.params.slug)))
 
-const { summary, coordinates } = useWikidata(cityName)
-const { cityWeather, country } = useWeather(cityName)
+const { summary, coordinates, isLoading: isWikidataLoading } = useWikidata(cityName)
+const { cityWeather, country, isLoading: isWeatherLoading } = useWeather(cityName)
+const isLoading = computed(() => isWikidataLoading.value || isWeatherLoading.value)
 const mapView = computed(() => ({
   center: {
     lat: coordinates.value.lat,
@@ -30,7 +31,7 @@ const cityViewData = computed<CityViewData>(() => ({
 
 <template>
   <div class="page-city">
-    <CityView :data="cityViewData" />
+    <CityView :data="cityViewData" :is-loading="isLoading" />
   </div>
 </template>
 
