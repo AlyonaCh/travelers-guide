@@ -1,4 +1,9 @@
 name: Deploy to GitHub Pages
+env:
+  # Forces GitHub Actions JavaScript runtime to Node.js 24.
+  # This removes the "Node.js 20 actions are deprecated" warning.
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 on:
   workflow_dispatch:
   push:
