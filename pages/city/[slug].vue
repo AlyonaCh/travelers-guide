@@ -35,8 +35,10 @@ const cityViewData = computed<CityViewData>(() => ({
 </template>
 
 <style lang="scss" scoped>
+@use '~/assets/styles/variables' as *;
+
 .page-city {
   min-height: 100vh;
-  background: var(--color-page-bg, #f5f6f8);
+  background: $color-page-bg;
 }
 </style>
