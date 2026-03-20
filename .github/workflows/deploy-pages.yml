@@ -26,8 +26,6 @@ jobs:
         env:
           # Project site: https://<user>.github.io/<repository>/
           NUXT_APP_BASE_URL: /${{ github.event.repository.name }}/
-          # In pages env there is no Nuxt server, so use client-side external API requests.
-          NUXT_PUBLIC_DEPLOY_ENV: pages
         run: npx nuxt build --preset github_pages
 
       - name: Upload Pages artifact
